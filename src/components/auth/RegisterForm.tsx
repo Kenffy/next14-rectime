@@ -17,34 +17,37 @@ import { Input } from "@/components/ui/input";
 import { Card } from "../ui/card";
 import { Button } from "../ui/button";
 import Link from "next/link";
+import { useState, useTransition } from "react";
+import { RegisterSchema } from "@/schemas";
+import { registerAsync } from "@/services/auth-services";
+import { FormError } from "../FormError";
 
-const formSchema = z.object({
-  username: z.string().min(2, {
-    message: "Username must be at least 2 characters.",
-  }),
-  email: z
-    .string()
-    .min(1, {
-      message: "Email is required.",
-    })
-    .email("This is not a valid email."),
-  password: z.string().min(6, {
-    message: "Password must be at least 6 characters.",
-  }),
-});
 
 export function RegisterForm() {
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const [error, setError] = useState<string | undefined>("")
+  const [success, setSuccess] = useState<string | undefined>("")
+  const [isPending, startTransition] = useTransition()
+
+  const form = useForm<z.infer<typeof RegisterSchema>>({
+    resolver: zodResolver(RegisterSchema),
     defaultValues: {
-      username: "",
       email: "",
       password: "",
-    },
-  });
+      name: ""
+    }
+  })
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
+  const onSubmit = (values: z.infer<typeof RegisterSchema>) => {
+    setError("")
+    setSuccess("")
+
+    startTransition(() => {
+      registerAsync(values)
+        .then((data) => {
+          setError(data.error)
+          setSuccess(data.success)
+        })
+    })
   }
 
   return (
@@ -59,12 +62,12 @@ export function RegisterForm() {
             >
               <FormField
                 control={form.control}
-                name="username"
+                name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className=" text-xs">Username</FormLabel>
+                    <FormLabel className=" text-xs">Name</FormLabel>
                     <FormControl>
-                      <Input placeholder="Username" {...field} />
+                      <Input disabled={isPending} placeholder="Name" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -77,7 +80,7 @@ export function RegisterForm() {
                   <FormItem>
                     <FormLabel className=" text-xs">Email</FormLabel>
                     <FormControl>
-                      <Input placeholder="Email" {...field} />
+                      <Input disabled={isPending} placeholder="Email" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -90,7 +93,7 @@ export function RegisterForm() {
                   <FormItem>
                     <FormLabel className=" text-xs">Password</FormLabel>
                     <FormControl>
-                      <Input
+                      <Input disabled={isPending}
                         type="password"
                         placeholder="Password"
                         {...field}
@@ -100,8 +103,9 @@ export function RegisterForm() {
                   </FormItem>
                 )}
               />
+              <FormError message={error} />
               <Button type="submit" className=" w-full">
-                Register
+                {isPending ? "Please wait..." : "Register"}
               </Button>
               <div className=" gap-2 flex items-center justify-end text-xs">
                 <span>Already an account?</span>

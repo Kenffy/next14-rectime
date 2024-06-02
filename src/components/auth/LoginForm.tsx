@@ -17,30 +17,51 @@ import { Input } from "@/components/ui/input";
 import { Card } from "../ui/card";
 import { Button } from "../ui/button";
 import Link from "next/link";
+import { useState, useTransition } from "react";
+import { LoginSchema } from "@/schemas";
+import { loginAsync } from "@/services/auth-services";
+import { useSearchParams } from "next/navigation";
+import { FormError } from "../FormError";
+import { FormSuccess } from "../FormSuccess";
 
-const formSchema = z.object({
-  email: z
-    .string()
-    .min(1, {
-      message: "Email is required.",
-    })
-    .email("This is not a valid email."),
-  password: z.string().min(6, {
-    message: "Password must be at least 6 characters.",
-  }),
-});
 
 export function LoginForm() {
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const searchParams = useSearchParams()
+  const callbackUrl = searchParams.get("callbackUrl")
+
+  const [error, setError] = useState<string | undefined>("")
+  const [success, setSuccess] = useState<string | undefined>("")
+  const [isPending, startTransition] = useTransition()
+
+  const form = useForm<z.infer<typeof LoginSchema>>({
+    resolver: zodResolver(LoginSchema),
     defaultValues: {
       email: "",
       password: "",
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
+  const onSubmit = (values: z.infer<typeof LoginSchema>) => {
+    setError("")
+    setSuccess("")
+
+    startTransition(() => {
+      loginAsync(values, callbackUrl)
+        .then((data) => {
+          console.log(data)
+          if (data?.error) {
+            form.reset()
+            setError(data.error)
+          }
+
+          if (data?.success) {
+            form.reset()
+            setSuccess(data.success)
+          }
+
+        })
+        .catch(() => setError("Something Went Wrong"))
+    })
   }
 
   return (
@@ -60,7 +81,7 @@ export function LoginForm() {
                   <FormItem>
                     <FormLabel className=" text-xs">Email</FormLabel>
                     <FormControl>
-                      <Input type="email" placeholder="Username" {...field} />
+                      <Input disabled={isPending} type="email" placeholder="Username" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -73,7 +94,7 @@ export function LoginForm() {
                   <FormItem>
                     <FormLabel className=" text-xs">Password</FormLabel>
                     <FormControl>
-                      <Input
+                      <Input disabled={isPending}
                         type="password"
                         placeholder="Password"
                         {...field}
@@ -83,8 +104,10 @@ export function LoginForm() {
                   </FormItem>
                 )}
               />
+              <FormError message={error} />
+              <FormSuccess message={success} />
               <Button type="submit" className=" w-full mt-4">
-                Login
+                {isPending ? "Please wait..." : "Login"}
               </Button>
               <div className=" mt-3 gap-2 flex items-center justify-end text-xs">
                 <span>No Account?</span>

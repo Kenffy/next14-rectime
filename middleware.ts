@@ -14,6 +14,7 @@ const { auth } = NextAuth(authConfig);
 export default auth((req) => {
   const { nextUrl } = req;
   const isLoggedIn = !!req.auth;
+  console.log('isLoggedIn: ', isLoggedIn)
 
   const isApiRoutes = nextUrl.pathname.startsWith(prefixRoutes);
   const isPublicRoutes = publicRoutes.includes(nextUrl.pathname);
@@ -30,8 +31,8 @@ export default auth((req) => {
     return;
   }
 
-  // if(isPublicRoutes) {
-  //   if(isLoggedIn) {
+  // if (isPublicRoutes) {
+  //   if (isLoggedIn) {
   //     return NextResponse.redirect(new URL(DEFAULT_REDIRECT_ROUTES, nextUrl))
   //   }
   //   return
@@ -46,7 +47,7 @@ export default auth((req) => {
     const encodeCallbackUrl = encodeURIComponent(callbackUrl);
 
     return Response.redirect(
-      new URL(`/auth/login?callbackUrl=${encodeCallbackUrl}`, nextUrl)
+      new URL(`/login?callbackUrl=${encodeCallbackUrl}`, nextUrl)
     );
   }
 });
