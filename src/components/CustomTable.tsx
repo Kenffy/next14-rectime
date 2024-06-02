@@ -7,6 +7,7 @@ import {
   TableHeader,
   TableRow,
 } from "./ui/table";
+import Upsert from "./Upsert";
 
 interface TableProps {
   days: Date[];
@@ -24,13 +25,13 @@ export default function CustomTable({ days }: TableProps) {
           <TableRow>
             <TableHead className="">Day</TableHead>
             <TableHead>Date</TableHead>
-            <TableHead>Start</TableHead>
-            <TableHead>End</TableHead>
-            <TableHead>Pause</TableHead>
-            <TableHead>Soll</TableHead>
-            <TableHead>Ist</TableHead>
-            <TableHead>Gleitzeit</TableHead>
-            <TableHead className="text-right">Actions</TableHead>
+            <TableHead className=" text-center">Start</TableHead>
+            <TableHead className=" text-center">End</TableHead>
+            <TableHead className=" text-center">Pause</TableHead>
+            <TableHead className=" text-center">Soll</TableHead>
+            <TableHead className=" text-center">Ist</TableHead>
+            <TableHead className=" text-center">Gleitzeit</TableHead>
+            <TableHead className=" text-end">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody className=" overflow-y-auto">
@@ -41,14 +42,14 @@ export default function CustomTable({ days }: TableProps) {
             >
               <TableCell className="">{format(day, "EEEEEE")}</TableCell>
               <TableCell className="">{format(day, "dd.MM.yyyy")}</TableCell>
-              <TableCell className="">{"00:00:00"}</TableCell>
-              <TableCell className="">{"00:00:00"}</TableCell>
-              <TableCell className="">{"--:--:--"}</TableCell>
-              <TableCell className="">{"--:--:--"}</TableCell>
-              <TableCell className="">{"--:--:--"}</TableCell>
-              <TableCell className="">{"--:--:--"}</TableCell>
-              <TableCell className=" flex items-center gap-3">
-                <span>Edit</span>
+              <TableCell className=" text-center">{"00:00:00"}</TableCell>
+              <TableCell className=" text-center">{"00:00:00"}</TableCell>
+              <TableCell className=" text-center">{"--:--:--"}</TableCell>
+              <TableCell className=" text-center">{"--:--:--"}</TableCell>
+              <TableCell className=" text-center">{"--:--:--"}</TableCell>
+              <TableCell className=" text-center">{"--:--:--"}</TableCell>
+              <TableCell className=" flex items-center justify-end gap-3">
+                <Upsert date={day}/>
               </TableCell>
             </TableRow>
           ))}

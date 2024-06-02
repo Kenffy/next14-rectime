@@ -69,7 +69,7 @@ function CustomCalendar() {
   return (
     <div className="custom-calendar w-full">
       <Tabs defaultValue="week" className=" w-ull">
-        <div className=" flex items-center justify-between">
+        <div className=" flex flex-col md:flex-row items-center justify-between py-3">
           <div className=" flex items-center gap-3">
             <Button variant="outline" onClick={handlePrev}>
               Prev
@@ -116,7 +116,7 @@ function CustomCalendar() {
             </Button>
           </div>
 
-          <TabsList className="grid w-fit grid-cols-3">
+          <TabsList className="grid w-full md:w-fit grid-cols-3 mt-4 md:mt-0">
             <TabsTrigger
               value="month"
               onClick={() => handleViewChange("month")}
